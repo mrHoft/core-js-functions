@@ -3,7 +3,7 @@
  * Please read the following tutorial before implementing tasks:                                *
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions                     *
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function   *
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments       *
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/params       *
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures                            *
  *                                                                                             *
  ********************************************************************************************* */
@@ -18,7 +18,7 @@
  *
  */
 function getCurrentFunctionName() {
-  throw new Error('Not implemented');
+  return getCurrentFunctionName.name;
 }
 
 /**
@@ -32,26 +32,26 @@ function getCurrentFunctionName() {
  *   getFunctionBody(hiHello) => "function hiHello() { console.log('hello world'); }"
  *
  */
-function getFunctionBody(/* func */) {
-  throw new Error('Not implemented');
+function getFunctionBody(func) {
+  return func ? func.toString() : '';
 }
 
 /**
- * Returns the array where each element is the count of function arguments.
+ * Returns the array where each element is the count of function params.
  *
  * @params {array} funcs - The array of functions.
- * @return {array} - The array of arguments count.
+ * @return {array} - The array of params count.
  *
  * @example
- *  getArgumentsCount([
+ *  getparamsCount([
  *    function(){ console.log('hello world'); },
  *    function myFunc(x) { return x; },
  *    (a, b) => a * b
  *  ]) => [0, 1, 2]
  *
  */
-function getArgumentsCount(/* funcs */) {
-  throw new Error('Not implemented');
+function getArgumentsCount(funcs) {
+  return funcs.map((func) => func.length);
 }
 
 /**
@@ -70,8 +70,8 @@ function getArgumentsCount(/* funcs */) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(/* exponent */) {
-  throw new Error('Not implemented');
+function getPowerFunction(exponent) {
+  return (x) => x ** exponent;
 }
 
 /**
@@ -87,8 +87,12 @@ function getPowerFunction(/* exponent */) {
  *   getPolynom(8)     => y = 8
  *   getPolynom()      => null
  */
-function getPolynom() {
-  throw new Error('Not implemented');
+function getPolynom(...params) {
+  if (params.length === 1) return () => params[0];
+  if (params.length === 2) return (x) => params[0] * x + params[1];
+  if (params.length === 3)
+    return (x) => params[0] * x ** 2 + params[1] * x + params[2];
+  return null;
 }
 
 /**
@@ -105,8 +109,14 @@ function getPolynom() {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
+function memoize(func) {
+  const cache = {};
+  return (a) => {
+    if (a in cache) return cache[a];
+    const res = func(a);
+    cache[a] = res;
+    return res;
+  };
 }
 
 /**
@@ -124,14 +134,26 @@ function memoize(/* func */) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  return () => {
+    let cur = 0;
+    let res = null;
+    while (cur < attempts) {
+      try {
+        res = func();
+        cur += 1;
+      } catch {
+        cur += 1;
+      }
+    }
+    return res;
+  };
 }
 
 /**
  * Returns the logging wrapper for the specified method,
  * Logger has to log the start and end of calling the specified function.
- * Logger has to log the arguments of invoked function.
+ * Logger has to log the params of invoked function.
  * The format of output log is:
  * <function name>(<arg1>, <arg2>,...,<argN>) starts
  * <function name>(<arg1>, <arg2>,...,<argN>) ends
@@ -151,12 +173,20 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return (...args) => {
+    const message = `${func.name}(${args
+      .map((a) => JSON.stringify(a))
+      .join()})`;
+    logFunc(`${message} starts`);
+    const res = func(...args);
+    logFunc(`${message} ends`);
+    return res;
+  };
 }
 
 /**
- * Return the function with partial applied arguments
+ * Return the function with partial applied params
  *
  * @param {Function} fn
  * @return {Function}
@@ -168,8 +198,8 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  return (...args2) => fn(...args1, ...args2);
 }
 
 /**
@@ -189,8 +219,13 @@ function partialUsingArguments(/* fn, ...args1 */) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(/* startFrom */) {
-  throw new Error('Not implemented');
+function getIdGeneratorFunction(startFrom) {
+  let id = startFrom;
+  return () => {
+    const res = id;
+    id += 1;
+    return res;
+  };
 }
 
 module.exports = {
